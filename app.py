@@ -5,7 +5,7 @@ import base64
 import io
 import os
 from dotenv import load_dotenv
-from time import sleep
+import time  # Corrected import statement
 
 # Load environment variables
 load_dotenv()
@@ -40,43 +40,25 @@ def call_runpod_api(content_image_base64, style_image_base64, image_size):
     }
 
     try:
+        # Start timer
+        start_time = time.time()
+
         # Initial API call to start the job
         response = requests.post(runpod_url, headers=headers, json=input_data, timeout=30).json()
 
+        # Calculate elapsed time
+        elapsed_time = time.time() - start_time
+
         if response.get("status") == "COMPLETED":
-            return response.get("output")
+            st.success(f"Style transfer completed in {elapsed_time:.2f} seconds")
+            return response.get("output"), elapsed_time
         else:
             st.error("Style transfer failed")
-            return None
-        # job_id = response["id"]
-
-        # # Create a status placeholder
-        # status_placeholder = st.empty()
-        
-        # file_parsed = False
-        # while not file_parsed:
-        #     status_placeholder.text("Waiting for style transfer to complete...")
-        #     waiting_response = requests.get(
-        #         f"https://api.runpod.ai/v2/{endpoint_id}/status/{job_id}", 
-        #         headers=headers, 
-        #         timeout=10
-        #     )
-            
-        #     status = waiting_response.json()["status"]
-        #     status_placeholder.text(f"Status: {status}")
-            
-        #     if status == "COMPLETED":
-        #         file_parsed = True
-        #         return waiting_response.json()["output"]
-        #     elif status == "FAILED":
-        #         st.error("Style transfer failed")
-        #         return None
-            
-        #     sleep(2)
+            return None, None
 
     except requests.exceptions.RequestException as e:
         st.error(f"Error calling RunPod API: {str(e)}")
-        return None
+        return None, None
 
 def main():
     st.title("Neural Style Transfer")
@@ -114,7 +96,7 @@ def main():
                 style_base64 = encode_image_to_base64(style_image)
 
                 # Call RunPod API with status updates
-                result = call_runpod_api(content_base64, style_base64, image_size)
+                result, elapsed_time = call_runpod_api(content_base64, style_base64, image_size)
 
                 if result and 'final_image' in result:
                     # Decode the base64 image
@@ -124,6 +106,9 @@ def main():
                     # Display the result
                     st.subheader("Generated Image")
                     st.image(output_image, caption="Style Transfer Result", use_container_width=True)
+                    
+                    # Show elapsed time
+                    st.write(f"Time taken for style transfer: {elapsed_time:.2f} seconds")
                     
                     # Add download button
                     buffered = io.BytesIO()
