@@ -44,7 +44,7 @@ def call_runpod_api(content_image_base64, style_image_base64, image_size):
         start_time = time.time()
 
         # Initial API call to start the job
-        response = requests.post(runpod_url, headers=headers, json=input_data, timeout=30).json()
+        response = requests.post(runpod_url, headers=headers, json=input_data, timeout=60).json()
 
         # Calculate elapsed time
         elapsed_time = time.time() - start_time
@@ -75,14 +75,14 @@ def main():
         content_file = st.file_uploader("Choose your target image", type=["png", "jpg", "jpeg"])
         if content_file is not None:
             content_image = load_image(content_file)
-            st.image(content_image, caption="Target Image", use_container_width=True)
+            st.image(content_image, caption="Target Image", use_column_width=True)
 
     with col2:
         st.subheader("Style Image")
         style_file = st.file_uploader("Choose your style image", type=["png", "jpg", "jpeg"])
         if style_file is not None:
             style_image = load_image(style_file)
-            st.image(style_image, caption="Style Image", use_container_width=True)
+            st.image(style_image, caption="Style Image", use_column_width=True)
 
     # Add image size selector
     st.sidebar.subheader("Settings")
@@ -105,10 +105,7 @@ def main():
                     
                     # Display the result
                     st.subheader("Generated Image")
-                    st.image(output_image, caption="Style Transfer Result", use_container_width=True)
-                    
-                    # Show elapsed time
-                    st.write(f"Time taken for style transfer: {elapsed_time:.2f} seconds")
+                    st.image(output_image, caption="Style Transfer Result", use_column_width=True)
                     
                     # Add download button
                     buffered = io.BytesIO()
