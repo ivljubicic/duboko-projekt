@@ -7,7 +7,7 @@ pip install -r requirements.txt
 
 Za pokretanje same aplikacije pokrenite:
 ```
-streamlit run all_in_one.py
+streamlit run app.py
 ```
 
 Odite na link [http://localhost:8501](http://localhost:8501) kako bi pristupili aplikaciji u browseru. 
